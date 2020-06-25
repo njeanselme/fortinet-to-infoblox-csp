@@ -5,9 +5,11 @@ import json
 import re
 import math
 import gzip
+import logging
 
 
 #########################################################			
+logging.basicConfig(handlers = [logging.FileHandler('fortiguard-to-infoblox-csp.log'), logging.StreamHandler()],level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 tide_apikey = ''
 csp_apikey  = ''
@@ -98,7 +100,10 @@ def generate_new_IOC_list(TIDE_IOCs,Fortiguard_IOCs):
 	for k in diff:
 		data[k] = Fortiguard_IOCs[k]
 	
-	print('IOC overlapping is {}%'.format(100-100*len(data)/len(Fortiguard_IOCs)))
+	logging.info('IOC overlapping is" {}%'.format(int(100-100*len(data)/len(Fortiguard_IOCs))))
+	logging.info('IOCs in Fortiguard: {}'.format(len(Fortiguard_IOCs)))
+	logging.info('IOCs in TIDE: {}'.format(len(TIDE_IOCs)))
+	logging.info('IOCs in Fortiguard but not in TIDE: {}'.format(len(data)))
 	
 	return data
 
@@ -157,7 +162,7 @@ def update_to_csp(new_IOCs, csp_apikey):
 		if len(filtered_IOCs_to_remove) > 0:
 			json_to_delete={}
 			json_to_delete['items_described']=filtered_IOCs_to_remove
-			print("Cleaning {} entries in named_list {}, {}".format(len(filtered_IOCs_to_remove),name_list['name'],name_list['id']))
+			logging.info("Cleaning {} entries in named_list {}, {}".format(len(filtered_IOCs_to_remove),name_list['name'],name_list['id']))
 			response = requests.delete('https://csp.infoblox.com/api/atcfw/v1/named_lists/{}/items'.format(name_list['id']), headers=headers, data=json.dumps(json_to_delete, indent=4, sort_keys=True), verify=True, timeout=(300,300))
 			
 	
@@ -166,7 +171,7 @@ def update_to_csp(new_IOCs, csp_apikey):
 	named_list_capacity_required = len(existing_IOCs) - len(IOCs_to_remove) + len (IOCs_to_add)
 	number_of_named_list_to_create = max(0,math.ceil((named_list_capacity_required - named_lists_current_capacity) / max_records_per_csp_list))
 		
-	print('named_lists_current_capacity = {}, named_list_capacity_required = {}, number_of_named_list_to_create = {}'.format(named_lists_current_capacity,named_list_capacity_required,number_of_named_list_to_create))
+	logging.info('named_lists_current_capacity = {}, named_list_capacity_required = {}, number_of_named_list_to_create = {}'.format(named_lists_current_capacity,named_list_capacity_required,number_of_named_list_to_create))
 	
 	
 	#Create the List ####################################
@@ -176,7 +181,7 @@ def update_to_csp(new_IOCs, csp_apikey):
 	
 	for i in range ( 1 , number_of_named_list_to_create+1):
 		json_to_create = '{"name": "'+ named_list_prefix + str(i+max(name_list_names)) +'", "type": "custom_list", "confidence_level": "MEDIUM", "threat_level": "MEDIUM", "items_described": [ { "description": "do not remove", "item": "must_have_at_least_1_bad_domain.xyz" }]}'
-		print("Adding Named_list {}".format(named_list_prefix + str(i+max(name_list_names))))
+		logging.info("Adding Named_list {}".format(named_list_prefix + str(i+max(name_list_names))))
 		response = requests.post('https://csp.infoblox.com/api/atcfw/v1/named_lists', headers=headers, data=json_to_create, verify=True, timeout=(300,300))
 
 
@@ -194,7 +199,7 @@ def update_to_csp(new_IOCs, csp_apikey):
 			j +=1
 		json_to_add={}
 		json_to_add['items_described'] = IOCs_to_add_to_list
-		print("Adding {} entries in named_list {}, {}".format(len(IOCs_to_add_to_list),named_list['name'],named_list['id']))
+		logging.info("Adding {} entries in named_list {}, {}".format(len(IOCs_to_add_to_list),named_list['name'],named_list['id']))
 		response = requests.post('https://csp.infoblox.com/api/atcfw/v1/named_lists/{}/items'.format(named_list['id']), headers=headers, data=json.dumps(json_to_add, indent=4, sort_keys=True), verify=True, timeout=(300,300))
 
 	
@@ -208,6 +213,8 @@ TIDE = getTIDEIOCs(hosts_url, tide_apikey)
 TIDE.update(getTIDEIOCs(  ips_url, tide_apikey))
 
 Fortiguard_IOCs = getFortiguardIOCs('sample.stix',fortiguard_apikey)
+
 new_IOCs = generate_new_IOC_list(TIDE, Fortiguard_IOCs)
+logging.debug("IOCs in Fortiguard but not in TIDE:\n{}".format(json.dumps(new_IOCs, indent=4, sort_keys=True)))
 
 update_to_csp(new_IOCs, csp_apikey)
