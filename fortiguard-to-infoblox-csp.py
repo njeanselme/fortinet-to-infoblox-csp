@@ -4,6 +4,8 @@ import base64
 import json
 import re
 import math
+import gzip
+
 
 #########################################################			
 
@@ -42,8 +44,20 @@ def getTIDEIOCs(url,tide_apikey):
 	
 #########################################################
 	
-def getFortiguardIOCs(file):
+def getFortiguardIOCs(file,fortiguard_apikey):
 	data ={}
+	
+	'''
+	headers= {'Authorization': 'Token:{}'.format(fortiguard_apikey)}
+	url= 'https://premiumapi.fortinet.com/v1/cti/feed/stix?cc=us'
+	response = requests.get(url, headers=headers, cookies=None, verify=True, timeout=(600,600), stream=True)
+	url = response.json()[0]['data']
+	response = requests.get(url, headers=headers, cookies=None, verify=True, timeout=(600,600), stream=True)
+	
+	with gzip.open('/home/joe/file.txt.gz', 'rb') as file:
+	    file_content = file.read()
+	'''
+	
 	stix_package = STIXPackage.from_xml(file)
 
 	ttps={}
@@ -70,10 +84,10 @@ def getFortiguardIOCs(file):
 					IOC['description'] = ttps[ttp_id]
 			
 			if 'item' in IOC:
-				data['item']=IOC
+				data[IOC['item']]=IOC
 		except:
 			pass
-		
+
 	return data
 
 #########################################################			
@@ -190,13 +204,10 @@ def update_to_csp(new_IOCs, csp_apikey):
 hosts_url = 'https://api.activetrust.net/api/data/threats/state/host?data_format=ndjson'
 ips_url   = 'https://api.activetrust.net/api/data/threats/state/IP?data_format=ndjson'
 
-TIDE_hosts = getTIDEIOCs(hosts_url, tide_apikey)
-TIDE_IPs   = getTIDEIOCs(  ips_url, tide_apikey)
-TIDE_merged = {}
-for d in (TIDE_hosts, TIDE_IPs): TIDE_merged.update(d)
+TIDE = getTIDEIOCs(hosts_url, tide_apikey)
+TIDE.update(getTIDEIOCs(  ips_url, tide_apikey))
 
-Fortiguard_IOCs = getFortiguardIOCs('sample2.stix')
-
-new_IOCs = generate_new_IOC_list(TIDE_merged, Fortiguard_IOCs)
+Fortiguard_IOCs = getFortiguardIOCs('sample.stix',fortiguard_apikey)
+new_IOCs = generate_new_IOC_list(TIDE, Fortiguard_IOCs)
 
 update_to_csp(new_IOCs, csp_apikey)
