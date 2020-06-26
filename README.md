@@ -11,3 +11,9 @@ Outputs:
 2020-06-26 11:56:17,728 - root - INFO - IOCs in Fortiguard: 48877
 2020-06-26 11:56:17,730 - root - INFO - IOCs in TIDE: 3666774
 2020-06-26 11:56:17,731 - root - INFO - IOCs in Fortiguard but not in TIDE: 28026
+2020-06-26 12:23:06,922 - root - INFO - Adding Named_list Fortiguard_IOC_1
+2020-06-26 12:23:07,402 - root - INFO - Adding Named_list Fortiguard_IOC_2
+2020-06-26 12:23:08,240 - root - INFO - Adding Named_list Fortiguard_IOC_3
+2020-06-26 12:23:10,089 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_1, 656899
+2020-06-26 12:23:17,987 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_2, 656900
+2020-06-26 12:23:25,145 - root - INFO - Adding 7923 entries in named_list Fortiguard_IOC_3, 656901
