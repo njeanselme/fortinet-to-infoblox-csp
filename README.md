@@ -4,12 +4,12 @@ Fortinet IOCs are enforced at DNS level globally on all DNS even for roaming use
 
 This python scripts 
 1) downloads all domain names and IP IOCs from Infoblox TIDE
-2) download all IOCs from Fortiguard premium API
-3) tests all domain names and IP IOCs from Fortinet to check if already present in TIDE an generate a list of new IOCs
-4) download all Fortiguard_* named_lists from csp.infoblox.com 
-5) remove entries from csp.infoblox.com that are not anymore in the list of new IOCs
-6) create new named_lists if capacity requires it
-7) add entries from the list of new IOCS to the named_lists
+2) downloads all IOCs from Fortiguard premium API
+3) tests all domain names and IP IOCs from Fortinet to check if already present in TIDE add generates a list of new IOCs
+4) downloads all Fortiguard_* named_lists from csp.infoblox.com 
+5) removes entries from csp.infoblox.com that are not anymore in the list of new IOCs
+6) creates new named_lists if capacity requires it
+7) adds entries from the list of new IOCS to the named_lists
 
 Prerequisistes:  
 5GB+ disk for IOCs download  
