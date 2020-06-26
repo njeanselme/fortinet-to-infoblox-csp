@@ -12,7 +12,7 @@ This scripts
 7) add entries from the list of new IOCS to the named_lists
 
 Prerequisistes:  
-5GB+ disk for IOCs download
+5GB+ disk for IOCs download  
 1GB+ RAM 
 
 Installation: 
