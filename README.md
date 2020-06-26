@@ -1,6 +1,6 @@
 # fortinet-to-infoblox-csp
-BloxOne Threat Defense integration with Fortiguard domain names and IPs brings an even wider IOC coverage by threat intelligence unification.  
-Fortinet IOCs are enforced at DNS level globally on all DNS even for roaming users who have not established their VPN.
+BloxOne Threat Defense integration with Fortiguard domain names and IPs brings an even wider threat intelligence coverage and protection.
+Fortinet IOCs are enforced at DNS level globally on all the organization DNS even for roaming users who have not established their VPN.
 
 This python scripts 
 1) downloads all domain names and IP IOCs from Infoblox TIDE
