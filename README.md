@@ -1,6 +1,16 @@
 # fortinet-to-infoblox-csp
 BloxOne Threat Defense integration with Fortiguard domain names and IPs brings an even wider IOC coverage by threat intelligence unification. Fortinet IOCs are enforced at DNS level globally on all DNS even for roaming users who have not established their VPN
 
+Prerequisistes:
+5GB+ disk
+1GB+ RAM
+
+Installation: 
+Set the following api keys:
+tide_apikey = ''
+csp_apikey  = ''
+fortiguard_apikey= ''
+
 
 Outputs:
 
