@@ -2,7 +2,7 @@
 BloxOne Threat Defense integration with Fortiguard domain names and IPs brings an even wider IOC coverage by threat intelligence unification.  
 Fortinet IOCs are enforced at DNS level globally on all DNS even for roaming users who have not established their VPN.
 
-This scripts 
+This python scripts 
 1) downloads all domain names and IP IOCs from Infoblox TIDE
 2) download all IOCs from Fortiguard premium API
 3) tests all domain names and IP IOCs from Fortinet to check if already present in TIDE an generate a list of new IOCs
@@ -15,7 +15,7 @@ Prerequisistes:
 5GB+ disk for IOCs download  
 1GB+ RAM 
 
-Installation: 
+Installation:  
 Set the following api keys:  
 tide_apikey = ''  
 csp_apikey  = ''  
