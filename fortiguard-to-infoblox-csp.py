@@ -58,7 +58,7 @@ def is_fqdn(hostname):
 
 def getTIDEIOCs(test_mode, ioctype, url,tide_apikey):
 	data ={}
-	filename = './tide_'+ ioctype + '_' + time.strftime("%Y%m%d") +'.json'
+	filename = './tide_'+ ioctype + '.json'
 	
 	if not test_mode:
 		method='GET'
@@ -72,6 +72,8 @@ def getTIDEIOCs(test_mode, ioctype, url,tide_apikey):
 		response = requests.get(url, headers=headers, cookies=None, verify=True, timeout=(600,600), stream=True)
 		with open(filename, 'wb') as file:
 			for chunk in response.iter_content(chunk_size=8192):
+				if not chunk:
+					break
 				file.write(chunk)
 
 	file= open(filename, 'r')
@@ -96,7 +98,7 @@ def getFortiguardIOCs(test_mode, fortiguard_apikey):
 	data ={}
 
 	headers= {'Token': '{}'.format(fortiguard_apikey)}
-	filename = './fortinet_all_'+ time.strftime("%Y%m%d") +'.csv'
+	filename = './fortinet_all.csv'
 	
 	if not test_mode:
 		url= 'https://premiumapi.fortinet.com/v1/cti/feed/csv?cc=all'
@@ -132,7 +134,7 @@ def generate_new_IOC_list(TIDE_IOCs,Fortiguard_IOCs):
 	for k in diff:
 		data[k] = Fortiguard_IOCs[k]
 	
-	logging.info('IOC overlapping is" {}%'.format(int(100-100*len(data)/len(Fortiguard_IOCs))))
+	logging.info('IOC overlapping is {}%'.format(int(100-100*len(data)/len(Fortiguard_IOCs))))
 	logging.info('IOCs in Fortiguard: {}'.format(len(Fortiguard_IOCs)))
 	logging.info('IOCs in TIDE: {}'.format(len(TIDE_IOCs)))
 	logging.info('IOCs in Fortiguard but not in TIDE: {}'.format(len(data)))
