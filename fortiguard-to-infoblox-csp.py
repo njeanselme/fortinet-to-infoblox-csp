@@ -7,6 +7,8 @@ import logging
 import time
 import gzip
 import ipaddress
+import urllib
+import ssl
 
 #########################################################			
 logging.basicConfig(handlers = [logging.FileHandler('fortiguard-to-infoblox-csp.log'), logging.StreamHandler()],level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -63,18 +65,13 @@ def getTIDEIOCs(test_mode, ioctype, url,tide_apikey):
 	if not test_mode:
 		method='GET'
 		auth = base64.encodebytes(('%s:%s' % (tide_apikey,' ')).encode()).decode().replace('\n', '').strip()
-		headers = {
-			'Authorization':'Basic %s' % auth,
-			'Content-Type':'application/x-www-form-urlencoded',
-			'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36',
-			'Cache-Control': 'no-cache'
-		}
-		response = requests.get(url, headers=headers, cookies=None, verify=True, timeout=(600,600), stream=True)
-		with open(filename, 'wb') as file:
-			for chunk in response.iter_content(chunk_size=8192):
-				if not chunk:
-					break
-				file.write(chunk)
+		
+		ssl._create_default_https_context = ssl._create_unverified_context
+		
+		opener = urllib.request.build_opener()
+		opener.addheaders = opener.addheaders = [('Authorization', 'Basic %s' % auth ), ('Content-Type','application/x-www-form-urlencoded') ,('User-agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36')]
+		urllib.request.install_opener(opener)
+		urllib.request.urlretrieve(url, filename)
 
 	file= open(filename, 'r')
 	
@@ -90,6 +87,7 @@ def getTIDEIOCs(test_mode, ioctype, url,tide_apikey):
 			data[r_json['ip']] = ''
 	
 	logging.info('Download ok, {} TIDE IOCs: {}'.format(ioctype,len(data)))
+	file.close()
 	return data
 	
 #########################################################
@@ -123,7 +121,7 @@ def getFortiguardIOCs(test_mode, fortiguard_apikey):
 		
 
 	logging.info('Download ok, Fortinet IOCs: {}'.format(len(data)))
-
+	file.close()
 	return data
 
 #########################################################			
@@ -224,16 +222,19 @@ def update_to_csp(new_IOCs, csp_apikey):
 	
 	
 	#Add to list ########################################
+	logging.debug('{:<20}  {:<50}'.format('-- Description --','-- IOC --'))
 	i=0
 	for named_list in list_of_named_lists:
 		IOCs_to_add_to_list = []
 		j=0
 		while int(j + int(named_list['item_count'])) < max_records_per_csp_list and i < len(IOCs_to_add):
 			IOCs_to_add_to_list.append(IOCs_to_add[i])
+			logging.debug('{:<20}  {:<50}'.format(IOCs_to_add[i].get('description',''),IOCs_to_add[i].get('item','')))
 			i +=1
 			j +=1
 		json_to_add={}
 		json_to_add['items_described'] = IOCs_to_add_to_list
+		
 		logging.info("Adding {} entries in named_list {}, {}".format(len(IOCs_to_add_to_list),named_list['name'],named_list['id']))
 		response = requests.post('https://csp.infoblox.com/api/atcfw/v1/named_lists/{}/items'.format(named_list['id']), headers=headers, data=json.dumps(json_to_add, indent=4, sort_keys=True), verify=True, timeout=(300,300))
 		try:
@@ -253,7 +254,5 @@ TIDE.update(getTIDEIOCs(use_already_downloaded_IOC_files, 'ip', ips_url, tide_ap
 Fortiguard_IOCs = getFortiguardIOCs(use_already_downloaded_IOC_files, fortiguard_apikey)
 
 new_IOCs = generate_new_IOC_list(TIDE, Fortiguard_IOCs)
-logging.debug('{:<20}  {:<50}'.format('-- Description --','-- IOC --'))
-[logging.debug('{:<20}  {:<50}'.format(new_IOCs[x].get('description',''),new_IOCs[x].get('item','')))  for x in set(new_IOCs)]
 
 update_to_csp(new_IOCs, csp_apikey)
