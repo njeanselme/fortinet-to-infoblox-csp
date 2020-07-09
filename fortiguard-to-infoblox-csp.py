@@ -9,6 +9,9 @@ import gzip
 import ipaddress
 import urllib
 import ssl
+from stix.core import STIXPackage
+from cybox.core import Observables
+
 
 #########################################################			
 logging.basicConfig(handlers = [logging.FileHandler('fortiguard-to-infoblox-csp.log'), logging.StreamHandler()],level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -94,12 +97,12 @@ def getTIDEIOCs(test_mode, ioctype, url,tide_apikey):
 	
 def getFortiguardIOCs(test_mode, fortiguard_apikey):
 	data ={}
-
+	
 	headers= {'Token': '{}'.format(fortiguard_apikey)}
-	filename = './fortinet_all.csv'
+	filename = './fortinet_all.stix'
 	
 	if not test_mode:
-		url= 'https://premiumapi.fortinet.com/v1/cti/feed/csv?cc=all'
+		url= 'https://premiumapi.fortinet.com/v1/cti/feed/stix?cc=all'
 		response = requests.get(url, headers=headers, cookies=None, verify=True, timeout=(600,600), stream=True)
 		
 		url = response.json()[0]['data']
@@ -109,19 +112,42 @@ def getFortiguardIOCs(test_mode, fortiguard_apikey):
 
 	file=open(filename, 'r')
 	
-	for line in file:
-		line = line.strip()
-		try:
-			if is_fqdn(line) or ipaddress.ip_address(line):
+	stix_package = STIXPackage.from_xml(filename)
+	
+	logging.info('Loading STIX package in memory OK')
+
+	ttps = stix_package.ttps.to_dict().get('ttps')
+	indicators = stix_package.indicators
+	
+	for indicator in indicators:
+		ttp_title = ''
+		observable_dict = {}
+		ttp_id=indicator.to_dict().get('indicated_ttps')[0].get('ttp').get('idref')
+		for ttp_ref in ttps:
+			if ttp_ref.get('id') == ttp_id:
+				ttp_title= ttp_ref.get('title')
+
+		for observable in indicator.observables:
+			try:
+				observable_dict = observable.to_dict()['object']['properties']
 				IOC = {}
-				IOC['item']=line
-				data[line] = IOC
-		except:
-			pass
+				if observable_dict.get('type')=='Domain Name':
+					line = observable_dict.get('value')
+				elif observable_dict.get('ip_address').get('address_value').get('condition') == 'Equals':
+					line = observable_dict.get('ip_address').get('address_value').get('value')		
+
+				if is_fqdn(line) or ipaddress.ip_address(line):
+					IOC['item']=line
+					IOC['description'] = ttp_title
+					data[line] = IOC
+					logging.debug(IOC)
+			except:
+				pass
 		
 
 	logging.info('Download ok, Fortinet IOCs: {}'.format(len(data)))
 	file.close()
+
 	return data
 
 #########################################################			
