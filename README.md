@@ -23,16 +23,19 @@ fortiguard_apikey= ''
 
 Outputs:  
 
-2020-06-26 11:56:13,776 - root - INFO - Download ok, host TIDE IOCs: 3533421  
-2020-06-26 11:56:16,418 - root - INFO - Download ok, ip TIDE IOCs: 133353  
-2020-06-26 11:56:16,617 - root - INFO - Download ok, Fortinet IOCs: 48877  
-2020-06-26 11:56:17,727 - root - INFO - IOC overlapping is 42%  
-2020-06-26 11:56:17,728 - root - INFO - IOCs in Fortiguard: 48877  
-2020-06-26 11:56:17,730 - root - INFO - IOCs in TIDE: 3666774  
-2020-06-26 11:56:17,731 - root - INFO - IOCs in Fortiguard but not in TIDE: 28026  
-2020-06-26 12:23:06,922 - root - INFO - Adding Named_list Fortiguard_IOC_1  
-2020-06-26 12:23:07,402 - root - INFO - Adding Named_list Fortiguard_IOC_2  
-2020-06-26 12:23:08,240 - root - INFO - Adding Named_list Fortiguard_IOC_3  
-2020-06-26 12:23:10,089 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_1, 656899  
-2020-06-26 12:23:17,987 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_2, 656900  
-2020-06-26 12:23:25,145 - root - INFO - Adding 7923 entries in named_list Fortiguard_IOC_3, 656901  
+2020-07-09 14:18:22,396 - root - INFO - Download ok, host TIDE IOCs: 4024664  
+2020-07-09 14:20:04,396 - root - INFO - Download ok, ip TIDE IOCs: 234286  
+2020-07-09 14:22:37,979 - root - INFO - Loading STIX package in memory OK  
+2020-07-09 14:23:12,185 - root - INFO - Download ok, Fortinet IOCs: 41618  
+2020-07-09 14:23:13,754 - root - INFO - IOC overlapping is 49%  
+2020-07-09 14:23:13,755 - root - INFO - IOCs in Fortiguard: 41618  
+2020-07-09 14:23:13,756 - root - INFO - IOCs in TIDE: 4258950  
+2020-07-09 14:23:13,756 - root - INFO - IOCs in Fortiguard but not in TIDE: 20975  
+2020-07-09 14:23:22,069 - root - INFO - Cleaning 1 entries in named_list Fortiguard_IOC_3, 656901  
+2020-07-09 14:23:22,593 - root - INFO - named_lists_current_capacity = 60000, named_list_capacity_required = 20975, number_of_named_list_to_create = 0  
+2020-07-09 14:23:25,292 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_1, 656899  
+2020-07-09 14:23:42,876 - root - INFO - Adding 9999 entries in named_list Fortiguard_IOC_2, 656900  
+2020-07-09 14:24:00,414 - root - INFO - Adding 977 entries in named_list Fortiguard_IOC_3, 656901  
+2020-07-09 14:24:02,041 - root - INFO - Adding 0 entries in named_list Fortiguard_IOC_4, 656910  
+2020-07-09 14:24:02,546 - root - INFO - Adding 0 entries in named_list Fortiguard_IOC_5, 656914  
+2020-07-09 14:24:03,172 - root - INFO - Adding 0 entries in named_list Fortiguard_IOC_6, 656915  
