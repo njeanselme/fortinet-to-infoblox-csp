@@ -140,7 +140,6 @@ def getFortiguardIOCs(test_mode, fortiguard_apikey):
 					IOC['item']=line
 					IOC['description'] = ttp_title
 					data[line] = IOC
-					logging.debug(IOC)
 			except:
 				pass
 		
