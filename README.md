@@ -13,7 +13,7 @@ This python scripts
 
 Prerequisistes:  
 5GB+ disk for IOCs download  
-1GB+ RAM 
+3GB+ RAM 
 
 Installation:  
 Set the following api keys:  
